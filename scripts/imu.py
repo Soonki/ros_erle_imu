@@ -2,44 +2,32 @@
 
 import spidev
 import time
-import rospy
 import math
 import numpy as np
 from time import time
 from MPU9250 import MPU9250
-from sensor_msgs.msg import Imu
 
 def talker():
-	pub = rospy.Publisher('imu', Imu, queue_size=10)
-	rospy.init_node('ros_erle_imu', anonymous=True)
-	rate = rospy.Rate(10)
-
 	imu = MPU9250()
 	imu.initialize()
-	
-	msg = Imu()
 
-	while not rospy.is_shutdown():
+	imu.read_acc()
 
-		imu.read_acc()
-		
-		msg.header.stamp = rospy.get_rostime()
-
-		m9a, m9g, m9m = imu.getMotion9()
+	m9a, m9g, m9m = imu.getMotion9()
 
 
-		#----------update IMU
-		ax = m9a[0]
-		ay = m9a[1]
-		az = m9a[2]
-		gx = m9g[0]
-		gy = m9g[1]
-		gz = m9g[2]
-		q0 = 0.0 #W
-		q1 = 0.0 #X
-		q2 = 0.0 #Y
-		q3 = 0.0 #Z
-		
+	#----------update IMU
+	ax = m9a[0]
+	ay = m9a[1]
+	az = m9a[2]
+	gx = m9g[0]
+	gy = m9g[1]
+	gz = m9g[2]
+	q0 = 0.0 #W
+	q1 = 0.0 #X
+	q2 = 0.0 #Y
+	q3 = 0.0 #Z
+
 		'''
 		#----------Calculate delta time
 		t = time()
@@ -47,7 +35,7 @@ def talker():
 		previoustime = currenttime
 		currenttime = 1000000 * t + t / 1000000
 		dt = (currenttime - previoustime) / 1000000.0
-		if (dt < (1/1300.0)) : 
+		if (dt < (1/1300.0)) :
 			time.sleep((1/1300.0 - dt) * 1000000)
 		t = time()
 		currenttime = 1000000 * t + t / 1000000
@@ -97,36 +85,6 @@ def talker():
 		q2 *= recipNorm
 		q3 *= recipNorm
 		'''
-
-		#Fill message
-		msg.orientation.x = q1
-		msg.orientation.y = q2
-		msg.orientation.z = q3
-		msg.orientation.w = q0
-		msg.orientation_covariance[0] = q1 * q1
-		msg.orientation_covariance[0] = q2 * q2
-		msg.orientation_covariance[0] = q3 * q3		
-
-		msg.angular_velocity.x = m9g[0]
-		msg.angular_velocity.y = m9g[1]
-		msg.angular_velocity.z = m9g[2]
-		msg.angular_velocity_covariance[0] = m9g[0] * m9g[0]
-        	msg.angular_velocity_covariance[4] = m9g[1] * m9g[1]
-        	msg.angular_velocity_covariance[8] = m9g[2] * m9g[2]
-		
-		msg.linear_acceleration.x = m9a[0]
-		msg.linear_acceleration.y = m9a[1]
-		msg.linear_acceleration.z = m9a[2]
-		msg.linear_acceleration_covariance[0] = m9a[0] * m9a[0]
-		msg.linear_acceleration_covariance[4] = m9a[1] * m9a[1]
-		msg.linear_acceleration_covariance[8] = m9a[2] * m9a[2]
-		
-		pub.publish(msg)
-
-		rate.sleep()
-
+		print m9a,m9g,m9m
 if __name__ == '__main__':
-	try:
-        	talker()
-  	except rospy.ROSInterruptException:
-        	pass
+        talker()
