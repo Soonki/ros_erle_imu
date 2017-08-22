@@ -4,7 +4,6 @@ import spidev
 import time
 import math
 import numpy as np
-from time import time
 from MPU9250 import MPU9250
 
 def talker():
@@ -17,16 +16,16 @@ def talker():
 
 
 	#----------update IMU
-	ax = m9a[0]
-	ay = m9a[1]
-	az = m9a[2]
-	gx = m9g[0]
-	gy = m9g[1]
-	gz = m9g[2]
-	q0 = 0.0 #W
-	q1 = 0.0 #X
-	q2 = 0.0 #Y
-	q3 = 0.0 #Z
+#	ax = m9a[0]
+#	ay = m9a[1]
+#	az = m9a[2]
+#	gx = m9g[0]
+#	gy = m9g[1]
+#	gz = m9g[2]
+#	q0 = 0.0 #W
+#	q1 = 0.0 #X
+#	q2 = 0.0 #Y
+#	q3 = 0.0 #Z
 
 #		'''
 #		#----------Calculate delta time
@@ -84,7 +83,14 @@ def talker():
 #		q1 *= recipNorm
 #		q2 *= recipNorm
 #		q3 *= recipNorm
-#S		'''
-		print m9a,m9g,m9m
+#		'''
+#	print np.round(m9a,3),np.round(m9g,3),np.round(m9m,3)
 if __name__ == '__main__':
-        talker()
+	imu = MPU9250()
+        imu.initialize()
+	while True:
+		t=time.time()
+	        #talker()
+        	imu.read_acc()
+        	m9a, m9g, m9m = imu.getMotion9()
+		print t-time.time(),m9a,m9g,m9m
